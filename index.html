@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fall-code | AI駆動開発 × ファイナンス</title>
+  <meta name="description" content="文系非エンジニアがClaude Codeで5つのプロダクトを開発。ビルドの全過程を公開中。">
+  <meta property="og:title" content="fall-code | AI駆動開発 × ファイナンス">
+  <meta property="og:description" content="文系非エンジニアがClaude Codeで5つのプロダクトを開発。ビルドの全過程を公開中。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fallcode-studio.github.io">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@fallcode_studio">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', 'Inter', Arial, sans-serif;
+      background: #0F1A2E;
+      color: #FFFFFF;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #2E75B6;
+      text-decoration: none;
+    }
+
+    a:hover {
+      opacity: 0.85;
+    }
+
+    .section {
+      padding: 100px 24px;
+    }
+
+    .section-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #2E75B6;
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(160deg, #1B2A4A 0%, #0F1A2E 100%);
+      padding: 24px;
+    }
+
+    .hero-name {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .hero-tagline {
+      font-size: 1.2rem;
+      color: #2E75B6;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .hero-sub {
+      font-size: 0.95rem;
+      color: #8EAFD0;
+      max-width: 480px;
+      margin: 0 auto 36px;
+      line-height: 1.8;
+    }
+
+    .hero-btn {
+      display: inline-block;
+      padding: 12px 32px;
+      border: 1.5px solid #2E75B6;
+      border-radius: 40px;
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hero-btn:hover {
+      background: #2E75B6;
+      color: #FFFFFF;
+      opacity: 1;
+    }
+
+    /* ===== Stats ===== */
+    .stats {
+      background: #0F1A2E;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: #1E2D45;
+      border-radius: 12px;
+      padding: 32px 16px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #2E75B6;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #8EAFD0;
+      margin-top: 8px;
+    }
+
+    /* ===== Products ===== */
+    .products {
+      background: linear-gradient(180deg, #0F1A2E 0%, #152238 100%);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      background: #1E2D45;
+      border-radius: 12px;
+      padding: 28px 24px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .product-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .product-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .badge-live {
+      background: #4CAF50;
+      color: #FFFFFF;
+    }
+
+    .badge-dev {
+      background: #FF9800;
+      color: #FFFFFF;
+    }
+
+    .product-desc {
+      font-size: 0.9rem;
+      color: #8EAFD0;
+      margin-bottom: 12px;
+    }
+
+    .product-detail {
+      font-size: 0.82rem;
+      color: #6B8FB8;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .product-link {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* ===== Timeline ===== */
+    .timeline {
+      background: #0F1A2E;
+    }
+
+    .timeline-list {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline-list::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: #2E3E58;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 7px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2E75B6;
+      border: 2px solid #0F1A2E;
+    }
+
+    .timeline-date {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 0.82rem;
+      color: #2E75B6;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .timeline-text {
+      font-size: 0.92rem;
+      color: #8EAFD0;
+    }
+
+    /* ===== X Highlights ===== */
+    .highlights {
+      background: linear-gradient(180deg, #0F1A2E 0%, #152238 100%);
+    }
+
+    .highlights-container {
+      max-width: 550px;
+      margin: 0 auto;
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      background: #0A1220;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .footer-x {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .footer-note {
+      font-size: 0.8rem;
+      color: #6B8FB8;
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+
+    .footer-copy {
+      font-size: 0.75rem;
+      color: #4A6585;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .hero-name {
+        font-size: 2.2rem;
+      }
+
+      .hero-tagline {
+        font-size: 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 80px 20px;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-name {
+        font-size: 1.8rem;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+      }
+
+      .stat-card {
+        padding: 24px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div>
+      <h1 class="hero-name">fall-code</h1>
+      <p class="hero-tagline">AI駆動開発 × ファイナンス</p>
+      <p class="hero-sub">文系非エンジニアがClaude Codeでプロダクトを作り、その過程をすべて公開しています。</p>
+      <a href="https://x.com/fallcode_studio" target="_blank" rel="noopener" class="hero-btn">@fallcode_studio</a>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="section stats">
+    <div class="section-inner">
+      <h2 class="section-title fade-in">数字で見る実績</h2>
+      <div class="stats-grid">
+        <div class="stat-card fade-in">
+          <div class="stat-number">5</div>
+          <div class="stat-label">プロダクト公開</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-number">32.2万</div>
+          <div class="stat-label">バズポスト最高インプレッション</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-number">6ヶ月</div>
+          <div class="stat-label">開発開始からの期間</div>
+        </div>
+        <div class="stat-card fade-in">
+          <div class="stat-number">0行</div>
+          <div class="stat-label">自分で書いたコード</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="section products">
+    <div class="section-inner">
+      <h2 class="section-title fade-in">プロダクト一覧</h2>
+      <div class="products-grid">
+
+        <div class="product-card fade-in">
+          <div class="product-header">
+            <span class="product-name">ダンドリ帳</span>
+            <span class="badge badge-live">公開中</span>
+          </div>
+          <p class="product-desc">マンション購入の段取りをステップバイステップでガイド</p>
+          <p class="product-detail">不動産購入の「何から始めればいいかわからない」を解決。購入検討者向けに段取りを可視化するWebアプリ。</p>
+          <a href="https://dandori-cho.com" target="_blank" rel="noopener" class="product-link">dandori-cho.com →</a>
+        </div>
+
+        <div class="product-card fade-in">
+          <div class="product-header">
+            <span class="product-name">みんふる</span>
+            <span class="badge badge-live">公開中</span>
+          </div>
+          <p class="product-desc">ふるさと納税の返礼品をAIがおすすめ</p>
+          <p class="product-detail">Rakuten Product Search API × Gemini 2.0 Flash で、あなたに最適な返礼品をAIが提案。Androidアプリも公開中。</p>
+          <a href="https://minfuru.org" target="_blank" rel="noopener" class="product-link">minfuru.org →</a>
+        </div>
+
+        <div class="product-card fade-in">
+          <div class="product-header">
+            <span class="product-name">手土産の栞</span>
+            <span class="badge badge-live">公開中</span>
+          </div>
+          <p class="product-desc">ビジネスシーンの手土産選びをAIが提案</p>
+          <p class="product-detail">相手・予算・シーンを入力するだけで、AIが最適な手土産を1つに絞って提案。Nikkei/Forbes風のエディトリアルデザイン。</p>
+          <a href="https://temiyage-shiori.com" target="_blank" rel="noopener" class="product-link">temiyage-shiori.com →</a>
+        </div>
+
+        <div class="product-card fade-in">
+          <div class="product-header">
+            <span class="product-name">とどまれ</span>
+            <span class="badge badge-live">公開中</span>
+          </div>
+          <p class="product-desc">サブスク解約防止Chrome拡張機能</p>
+          <p class="product-detail">解約ページに到達すると「本当に解約しますか？」と冷静に考え直す機会を提供するChrome拡張。</p>
+          <a href="#" class="product-link">Chrome Web Store（準備中）→</a>
+        </div>
+
+        <div class="product-card fade-in">
+          <div class="product-header">
+            <span class="product-name">Cashflow Autopilot</span>
+            <span class="badge badge-dev">開発中</span>
+          </div>
+          <p class="product-desc">PL/BSから資金繰り表を自動生成</p>
+          <p class="product-detail">残高試算表をアップロードするだけで、キャッシュフロー計算書と資金繰り表を自動作成するブラウザアプリ。CFO経験を活かしたプロダクト。</p>
+          <span class="product-link" style="color:#6B8FB8;">開発中</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="section timeline">
+    <div class="section-inner">
+      <h2 class="section-title fade-in">ビルドログ</h2>
+      <div class="timeline-list" id="timeline"></div>
+    </div>
+  </section>
+
+  <!-- X Highlights -->
+  <section class="section highlights">
+    <div class="section-inner">
+      <h2 class="section-title fade-in">X ハイライト</h2>
+      <div class="highlights-container fade-in">
+        <!-- Post 1: Add more posts by duplicating the blockquote below -->
+        <blockquote class="twitter-tweet" data-theme="dark">
+          <a href="https://x.com/fallcode_studio/status/2033097794333098110"></a>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-x"><a href="https://x.com/fallcode_studio" target="_blank" rel="noopener">X: @fallcode_studio</a></p>
+    <p class="footer-note">すべてのプロダクトは Claude Code × Cursor × Antigravity で開発しています</p>
+    <p class="footer-copy">&copy; 2025-2026 fall-code</p>
+  </footer>
+
+  <script async src="https://platform.twitter.com/widgets.js"></script>
+  <script>
+    // Timeline data — add a new entry to this array to update the timeline
+    const timelineData = [
+      { date: "2025.10", text: "X（@fallcode_studio）開設。AI駆動開発の発信を開始" },
+      { date: "2025.11", text: "ダンドリ帳（dandori-cho.com）リリース" },
+      { date: "2025.12", text: "みんふる（minfuru.org）リリース" },
+      { date: "2026.01", text: "手土産の栞（temiyage-shiori.com）リリース" },
+      { date: "2026.02", text: "とどまれ（Chrome拡張）リリース" },
+      { date: "2026.03", text: "Xでバズポスト達成（32.2万インプレッション）" },
+      { date: "2026.03", text: "Cashflow Autopilot 開発開始" },
+      { date: "2026.03", text: "みんふる Androidアプリ Google Play公開" },
+    ];
+
+    (function renderTimeline() {
+      const container = document.getElementById("timeline");
+      container.innerHTML = timelineData.map(item =>
+        `<div class="timeline-item fade-in">
+          <div class="timeline-date">${item.date}</div>
+          <div class="timeline-text">${item.text}</div>
+        </div>`
+      ).join("");
+    })();
+
+    // Scroll fade-in observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

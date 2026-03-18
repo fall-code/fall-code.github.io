@@ -287,8 +287,20 @@
       }
 
       .hero {
-        min-height: 60vh;
-        padding: 120px 20px 80px;
+        min-height: auto;
+        padding: 120px 20px 60px;
+      }
+
+      .hero-title {
+        font-size: clamp(1.8rem, 8vw, 2.4rem);
+      }
+
+      .hero-title br {
+        display: none;
+      }
+
+      .hero-sub {
+        font-size: 0.95rem;
       }
 
       .products {
@@ -301,12 +313,47 @@
       }
 
       .product-card {
-        padding: 32px 24px;
+        padding: 28px 20px;
+      }
+
+      .product-name {
+        font-size: 1.1rem;
+      }
+
+      .product-desc {
+        font-size: 0.88rem;
       }
 
       .footer-inner {
         flex-direction: column;
         gap: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 100px 16px 48px;
+      }
+
+      .hero-title {
+        font-size: 1.6rem;
+      }
+
+      .hero-sub {
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .products {
+        padding: 32px 12px 60px;
+      }
+
+      .product-card {
+        padding: 24px 16px;
+      }
+
+      .products-title {
+        font-size: 1.3rem;
       }
     }
   </style>
@@ -324,7 +371,7 @@
     <div class="hero-inner">
       <span class="hero-label fade-in">Products by fall-code</span>
       <h1 class="hero-title fade-in">AIと作る、<br>日常を変えるプロダクト。</h1>
-      <p class="hero-sub fade-in">Claude Code によるAI駆動開発で、ファイナンスと暮らしの課題を解くプロダクトを作っています。</p>
+      <p class="hero-sub fade-in">Claude Code によるAI駆動開発で、暮らしの「面倒」を解決するプロダクトを作っています。</p>
     </div>
   </section>
 
@@ -339,29 +386,29 @@
 
         <div class="product-card fade-in">
           <span class="product-status live">Live</span>
-          <h3 class="product-name">ダンドリ帳</h3>
-          <p class="product-desc">マンション購入の段取りをステップバイステップでガイドするWebアプリ。「何から始めればいいかわからない」を解決します。</p>
-          <a href="https://dandori-cho.com" target="_blank" rel="noopener" class="product-link">dandori-cho.com <span class="arrow">→</span></a>
+          <h3 class="product-name">マンション売買ダンドリ帳</h3>
+          <p class="product-desc">マンション購入のダンドリを整理し、無知で損・ミスを防ぐことができるウェブアプリ。</p>
+          <a href="https://dandori-cho.com/welcome" target="_blank" rel="noopener" class="product-link">dandori-cho.com <span class="arrow">→</span></a>
         </div>
 
         <div class="product-card fade-in">
           <span class="product-status live">Live</span>
-          <h3 class="product-name">みんふる</h3>
-          <p class="product-desc">ふるさと納税の返礼品をAIがおすすめ。Rakuten API × Gemini 2.0 Flash であなたに最適な返礼品を提案します。</p>
+          <h3 class="product-name">みんなのふるさと納税</h3>
+          <p class="product-desc">家族の寄付枠を一画面で把握し、ほしいものリストから注文管理までできるウェブアプリ。iOS/Androidアプリも作成中。</p>
           <a href="https://minfuru.org" target="_blank" rel="noopener" class="product-link">minfuru.org <span class="arrow">→</span></a>
         </div>
 
         <div class="product-card fade-in">
           <span class="product-status live">Live</span>
           <h3 class="product-name">手土産の栞</h3>
-          <p class="product-desc">ビジネスシーンの手土産選びをAIが提案。相手・予算・シーンを入力するだけで、最適な手土産を絞り込みます。</p>
+          <p class="product-desc">失敗しない手土産を、5つの質問に答えるだけでオススメしてくれるWebサイト。</p>
           <a href="https://temiyage-shiori.com" target="_blank" rel="noopener" class="product-link">temiyage-shiori.com <span class="arrow">→</span></a>
         </div>
 
         <div class="product-card fade-in">
           <span class="product-status live">Live</span>
           <h3 class="product-name">とどまれ</h3>
-          <p class="product-desc">サブスク解約防止のChrome拡張機能。解約ページに到達すると、冷静に考え直す機会を提供します。</p>
+          <p class="product-desc">SNS・AIサイトの利用時間を制限し、使いすぎを防止するChrome拡張機能。段階的な通知と週間レポートで自分の利用パターンに気づけます。</p>
           <a href="https://chromewebstore.google.com/detail/%E3%81%A8%E3%81%A9%E3%81%BE%E3%82%8C/ddfbobeaongilcalinjjnpgbbglocgeo" target="_blank" rel="noopener" class="product-link">Chrome Web Store <span class="arrow">→</span></a>
         </div>
 

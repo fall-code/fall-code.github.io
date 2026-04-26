@@ -155,11 +155,7 @@
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1px;
-      background: rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 16px;
-      overflow: hidden;
+      gap: 20px;
     }
 
     .product-card {
@@ -167,11 +163,10 @@
       padding: 40px 36px;
       display: flex;
       flex-direction: column;
-      transition: background 0.3s;
-    }
-
-    .product-card:hover {
-      background: #FAFAF7;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
+      will-change: transform;
     }
 
     .product-status {
@@ -342,7 +337,6 @@
 
       .products-grid {
         grid-template-columns: 1fr;
-        border-radius: 12px;
       }
 
       .product-card {
@@ -751,6 +745,31 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  })();
+  </script>
+
+  <script>
+  (function() {
+    if (window.innerWidth < 768) return;
+
+    document.querySelectorAll('.product-card').forEach(function(card) {
+      card.addEventListener('mousemove', function(e) {
+        var rect = card.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width;
+        var y = (e.clientY - rect.top) / rect.height;
+        var tiltX = (0.5 - y) * 10;
+        var tiltY = (x - 0.5) * 10;
+        card.style.transform = 'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale3d(1.03, 1.03, 1.03)';
+        var shadowX = (x - 0.5) * -20;
+        var shadowY = (y - 0.5) * -20;
+        card.style.boxShadow = shadowX + 'px ' + shadowY + 'px 40px rgba(0,0,0,0.10)';
+      });
+
+      card.addEventListener('mouseleave', function() {
+        card.style.transform = '';
+        card.style.boxShadow = '';
+      });
     });
   })();
   </script>

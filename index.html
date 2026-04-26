@@ -613,6 +613,32 @@
     var scrollY = 0;
     var clock = new THREE.Clock();
 
+    // --- 3D Cursor ---
+    var cursorMesh = null;
+    var mousePixel = { x: -100, y: -100 };
+    var prevPixel = { x: 0, y: 0 };
+    var mouseSpeed = 0;
+    var cursorVisible = false;
+    var cursorScaleTarget = 1;
+
+    if (!isMobile) {
+      var cGeo = new THREE.IcosahedronGeometry(0.35, 1);
+      var cMat = new THREE.MeshBasicMaterial({
+        color: ACCENT,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.55,
+      });
+      cursorMesh = new THREE.Mesh(cGeo, cMat);
+      cursorMesh.position.z = 5;
+      cursorMesh.visible = false;
+      scene.add(cursorMesh);
+
+      var cursorStyle = document.createElement('style');
+      cursorStyle.textContent = '*, *::before, *::after { cursor: none !important; }';
+      document.head.appendChild(cursorStyle);
+    }
+
     // --- Animate ---
     function animate() {
       requestAnimationFrame(animate);
@@ -672,6 +698,32 @@
       camera.rotation.x = mouse.y * 0.02;
       camera.rotation.y = mouse.x * 0.02;
 
+      // 3D Cursor
+      if (cursorMesh) {
+        var vFOV = 60 * Math.PI / 180;
+        var cDist = camera.position.z - 5;
+        var visH = 2 * Math.tan(vFOV / 2) * cDist;
+        var visW = visH * camera.aspect;
+        var cTargetX = (mousePixel.x / window.innerWidth - 0.5) * visW;
+        var cTargetY = -(mousePixel.y / window.innerHeight - 0.5) * visH + camera.position.y;
+        cursorMesh.position.x += (cTargetX - cursorMesh.position.x) * 0.15;
+        cursorMesh.position.y += (cTargetY - cursorMesh.position.y) * 0.15;
+
+        var dx = mousePixel.x - prevPixel.x;
+        var dy = mousePixel.y - prevPixel.y;
+        mouseSpeed += (Math.sqrt(dx * dx + dy * dy) - mouseSpeed) * 0.2;
+        prevPixel.x = mousePixel.x;
+        prevPixel.y = mousePixel.y;
+
+        var rotMul = 1 + mouseSpeed * 0.08;
+        cursorMesh.rotation.x += 0.01 * rotMul;
+        cursorMesh.rotation.y += 0.015 * rotMul;
+
+        var cs = cursorMesh.scale.x + (cursorScaleTarget - cursorMesh.scale.x) * 0.1;
+        cursorMesh.scale.set(cs, cs, cs);
+        cursorMesh.visible = cursorVisible;
+      }
+
       renderer.render(scene, camera);
     }
 
@@ -681,7 +733,14 @@
     document.addEventListener('mousemove', function(e) {
       mouse.tx = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.ty = -(e.clientY / window.innerHeight - 0.5) * 2;
+      mousePixel.x = e.clientX;
+      mousePixel.y = e.clientY;
+      cursorVisible = true;
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      cursorScaleTarget = (el && (el.tagName === 'A' || el.closest('a'))) ? 1.6 : 1;
     });
+
+    document.addEventListener('mouseleave', function() { cursorVisible = false; });
 
     window.addEventListener('scroll', function() { scrollY = window.scrollY; }, { passive: true });
 

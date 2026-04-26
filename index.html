@@ -393,9 +393,21 @@
         font-size: 1.38rem;
       }
     }
+
+    /* ===== Three.js Overlay ===== */
+    #three-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+  <canvas id="three-overlay"></canvas>
 
   <!-- Nav -->
   <nav class="nav">
@@ -493,6 +505,192 @@
     }, { threshold: 0.1 });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+  (function() {
+    var canvas = document.getElementById('three-overlay');
+    if (!canvas || !window.THREE) return;
+
+    var isMobile = window.innerWidth < 768;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 20;
+
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: !isMobile });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    var ACCENT = 0xC8693A;
+    var DARK = 0x1A1A1A;
+
+    // --- Wireframe Shapes ---
+    var shapeConfigs = [
+      { type: 'Icosahedron', size: 2.5, x: -9, y: 6, z: -5, opacity: 0.13, color: ACCENT },
+      { type: 'Octahedron',  size: 2.0, x: 11, y: 4, z: -3, opacity: 0.16, color: ACCENT },
+      { type: 'Torus',       size: 1.8, x: -6, y: -5, z: -8, opacity: 0.10, color: ACCENT },
+      { type: 'Dodecahedron',size: 1.5, x: 8,  y: -7, z: -6, opacity: 0.14, color: ACCENT },
+      { type: 'Icosahedron', size: 3.5, x: 1,  y: 10, z: -12, opacity: 0.07, color: DARK },
+      { type: 'Tetrahedron', size: 1.2, x: -13, y: -1, z: -4, opacity: 0.15, color: ACCENT },
+      { type: 'Octahedron',  size: 2.2, x: 13, y: -3, z: -9, opacity: 0.09, color: DARK },
+    ];
+
+    function makeGeo(type, size) {
+      switch (type) {
+        case 'Icosahedron':  return new THREE.IcosahedronGeometry(size, 1);
+        case 'Octahedron':   return new THREE.OctahedronGeometry(size, 0);
+        case 'Dodecahedron': return new THREE.DodecahedronGeometry(size, 0);
+        case 'Tetrahedron':  return new THREE.TetrahedronGeometry(size, 0);
+        case 'Torus':        return new THREE.TorusGeometry(size, size * 0.3, 12, 24);
+        default:             return new THREE.IcosahedronGeometry(size, 1);
+      }
+    }
+
+    var shapes = shapeConfigs.map(function(cfg, i) {
+      var geo = makeGeo(cfg.type, cfg.size);
+      var mat = new THREE.MeshBasicMaterial({
+        color: cfg.color,
+        wireframe: true,
+        transparent: true,
+        opacity: cfg.opacity,
+      });
+      var mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(cfg.x, cfg.y, cfg.z);
+      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      mesh.userData = {
+        baseX: cfg.x,
+        baseY: cfg.y,
+        rotSpeed: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.004,
+          (Math.random() - 0.5) * 0.004,
+          (Math.random() - 0.5) * 0.001
+        ),
+        floatFreq: 0.2 + Math.random() * 0.4,
+        floatAmp: 0.3 + Math.random() * 0.8,
+        depth: cfg.z,
+      };
+      scene.add(mesh);
+      return mesh;
+    });
+
+    // --- Particles ---
+    var PARTICLE_COUNT = isMobile ? 40 : 100;
+    var pGeo = new THREE.BufferGeometry();
+    var pPos = new Float32Array(PARTICLE_COUNT * 3);
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+      pPos[i * 3]     = (Math.random() - 0.5) * 50;
+      pPos[i * 3 + 1] = (Math.random() - 0.5) * 35;
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 20 - 5;
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    var pMat = new THREE.PointsMaterial({
+      color: ACCENT,
+      size: 0.06,
+      transparent: true,
+      opacity: 0.35,
+      sizeAttenuation: true,
+    });
+    var particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // --- Connection Lines ---
+    var MAX_LINES = 21;
+    var lineArr = new Float32Array(MAX_LINES * 6);
+    var lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(lineArr, 3));
+    lineGeo.setDrawRange(0, 0);
+    var lineMat = new THREE.LineBasicMaterial({
+      color: ACCENT,
+      transparent: true,
+      opacity: 0.06,
+    });
+    var lines = new THREE.LineSegments(lineGeo, lineMat);
+    scene.add(lines);
+
+    // --- State ---
+    var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+    var scrollY = 0;
+    var clock = new THREE.Clock();
+
+    // --- Animate ---
+    function animate() {
+      requestAnimationFrame(animate);
+      var t = clock.getElapsedTime();
+
+      mouse.x += (mouse.tx - mouse.x) * 0.04;
+      mouse.y += (mouse.ty - mouse.y) * 0.04;
+
+      // Shapes
+      for (var i = 0; i < shapes.length; i++) {
+        var mesh = shapes[i];
+        var d = mesh.userData;
+        mesh.rotation.x += d.rotSpeed.x;
+        mesh.rotation.y += d.rotSpeed.y;
+        mesh.rotation.z += d.rotSpeed.z;
+        var floatY = Math.sin(t * d.floatFreq + i * 1.7) * d.floatAmp;
+        var floatX = Math.sin(t * d.floatFreq * 0.7 + i * 2.3) * d.floatAmp * 0.5;
+        var pFactor = 1 - (d.depth + 15) / 30;
+        mesh.position.x = d.baseX + floatX + mouse.x * pFactor * 3;
+        mesh.position.y = d.baseY + floatY + mouse.y * pFactor * 2;
+      }
+
+      // Particles drift
+      var pa = particles.geometry.attributes.position.array;
+      for (var j = 0; j < PARTICLE_COUNT; j++) {
+        pa[j * 3 + 1] += 0.003;
+        if (pa[j * 3 + 1] > 20) pa[j * 3 + 1] = -20;
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
+      particles.position.x = mouse.x * 0.5;
+      particles.position.y = mouse.y * 0.3;
+
+      // Connection lines
+      var li = 0;
+      var lp = lines.geometry.attributes.position.array;
+      for (var a = 0; a < shapes.length; a++) {
+        for (var b = a + 1; b < shapes.length; b++) {
+          if (li >= MAX_LINES) break;
+          var dist = shapes[a].position.distanceTo(shapes[b].position);
+          if (dist < 16) {
+            var base = li * 6;
+            lp[base]     = shapes[a].position.x;
+            lp[base + 1] = shapes[a].position.y;
+            lp[base + 2] = shapes[a].position.z;
+            lp[base + 3] = shapes[b].position.x;
+            lp[base + 4] = shapes[b].position.y;
+            lp[base + 5] = shapes[b].position.z;
+            li++;
+          }
+        }
+      }
+      lineGeo.setDrawRange(0, li * 2);
+      lines.geometry.attributes.position.needsUpdate = true;
+
+      // Scroll parallax
+      camera.position.y = -(scrollY * 0.008);
+      camera.rotation.x = mouse.y * 0.02;
+      camera.rotation.y = mouse.x * 0.02;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- Events ---
+    document.addEventListener('mousemove', function(e) {
+      mouse.tx = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouse.ty = -(e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    window.addEventListener('scroll', function() { scrollY = window.scrollY; }, { passive: true });
+
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  })();
   </script>
 </body>
 </html>

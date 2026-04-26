@@ -706,8 +706,8 @@
         var visW = visH * camera.aspect;
         var cTargetX = (mousePixel.x / window.innerWidth - 0.5) * visW;
         var cTargetY = -(mousePixel.y / window.innerHeight - 0.5) * visH + camera.position.y;
-        cursorMesh.position.x += (cTargetX - cursorMesh.position.x) * 0.15;
-        cursorMesh.position.y += (cTargetY - cursorMesh.position.y) * 0.15;
+        cursorMesh.position.x += (cTargetX - cursorMesh.position.x) * 0.4;
+        cursorMesh.position.y += (cTargetY - cursorMesh.position.y) * 0.4;
 
         var dx = mousePixel.x - prevPixel.x;
         var dy = mousePixel.y - prevPixel.y;
@@ -736,8 +736,11 @@
       mousePixel.x = e.clientX;
       mousePixel.y = e.clientY;
       cursorVisible = true;
-      var el = document.elementFromPoint(e.clientX, e.clientY);
-      cursorScaleTarget = (el && (el.tagName === 'A' || el.closest('a'))) ? 1.6 : 1;
+    });
+
+    document.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('mouseenter', function() { cursorScaleTarget = 1.6; });
+      a.addEventListener('mouseleave', function() { cursorScaleTarget = 1; });
     });
 
     document.addEventListener('mouseleave', function() { cursorVisible = false; });
